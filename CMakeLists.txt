@@ -11,10 +11,11 @@ set(CMAKE_BUILD_TYPE Debug)
 #build application
 add_executable(application "")
 
-target_link_libraries(application PUBLIC hardware)
+target_link_libraries(application PUBLIC hardware json-c)
 
 target_sources(application
   PUBLIC 
+  ${CMAKE_CURRENT_LIST_DIR}/lib/json.c
   ${CMAKE_CURRENT_LIST_DIR}/src/main.c
   )
 
@@ -24,3 +25,4 @@ target_include_directories(application
   )
 
 install(TARGETS application DESTINATION bin)
+file(COPY properties/properties.json DESTINATION bin)

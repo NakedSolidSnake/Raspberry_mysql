@@ -2,16 +2,21 @@
 #include <led.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <json.h>
+
+typedef struct 
+{
+    char *hostname;
+    char *username;
+    char *password;
+    char *database;
+} Database;
 
 #define _1MS    1000
 
 static void inputHandler(void);
+static void loadParams(const char *properties, Database *database);
 static int state = 0;
-
-static LED_t led = {
-        .gpio.pin = 0,
-        .gpio.eMode = eModeOutput
-    };
 
 static Button_t button = {
         .gpio.pin = 7,
@@ -21,10 +26,17 @@ static Button_t button = {
         .cb = inputHandler
     };
 
+
 int main(int argc, char const *argv[])
 {   
+    Database database = {0};
     eState_t eState = eStateLow;
-    
+    LED_t led = {
+        .gpio.pin = 0,
+        .gpio.eMode = eModeOutput
+    };
+
+    loadParams("properties.json", &database);
 
     /* Initialize Led and Button */
     if(Button_init(&button))
@@ -60,4 +72,27 @@ static void inputHandler(void)
 
         state = 1;
     }
+}
+
+static void loadParams(const char *properties, Database *database)
+{
+    char buffer[1024] = {0};
+    IHandler iParams[] = 
+    {
+        {.token = "hostname", .data = &database->hostname, .type = eType_String, .child = NULL},
+        {.token = "username", .data = &database->username, .type = eType_String, .child = NULL},
+        {.token = "password", .data = &database->password, .type = eType_String, .child = NULL},
+        {.token = "database", .data = &database->database, .type = eType_String, .child = NULL}
+    };
+
+    IHandler iDatabase[] = 
+    {
+        {.token = "database", .data = NULL, .type = eType_Object, .child = iParams, .size = getItems(iParams)}
+    };
+
+    if(!getJsonFromFile(properties, buffer, 1024)){
+        exit(EXIT_FAILURE);
+    }
+
+    processJson(buffer, iDatabase, getItems(iDatabase));
 }

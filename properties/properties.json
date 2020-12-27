@@ -1,0 +1,8 @@
+{
+    "database":{
+        "password": "my+pass",
+        "username": "root",
+        "hostname": "localhost",
+        "database": "led_info"
+    }
+}
