@@ -2,7 +2,11 @@
 #include <led.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include <json.h>
+#include <db.h>
+#include <time.h>
 
 typedef struct 
 {
@@ -16,6 +20,8 @@ typedef struct
 
 static void inputHandler(void);
 static void loadParams(const char *properties, Database *database);
+char *insert(void *data);
+
 static int state = 0;
 
 static Button_t button = {
@@ -38,9 +44,12 @@ int main(int argc, char const *argv[])
 
     loadParams("properties.json", &database);
 
+    initdb(database.hostname, database.username, database.password, database.database);
+
     /* Initialize Led and Button */
     if(Button_init(&button))
         return EXIT_FAILURE;
+        
     if(LED_init(&led))
         return EXIT_FAILURE;
 
@@ -55,12 +64,14 @@ int main(int argc, char const *argv[])
             else
                 eState = eStateLow;
 
+            insertdb(insert, &eState);
             state = 0;
         }
 
         usleep(_1MS);
     }
 
+    closedb();
     return 0;
 }
 
@@ -95,4 +106,17 @@ static void loadParams(const char *properties, Database *database)
     }
 
     processJson(buffer, iDatabase, getItems(iDatabase));
+}
+
+char *insert(void *data)
+{
+    static char query[1024] = {0};
+    int state = *(int *)data;
+    time_t epoch;
+
+    epoch = time(NULL);
+
+    snprintf(query, 1024, "insert into led_table (timestamp, state) values (%ld, '%s')", epoch, state ? "OFF": "ON");
+
+    return query;
 }

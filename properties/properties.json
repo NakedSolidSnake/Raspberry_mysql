@@ -1,6 +1,6 @@
 {
     "database":{
-        "password": "my+pass",
+        "password": "root",
         "username": "root",
         "hostname": "localhost",
         "database": "led_info"
