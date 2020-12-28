@@ -2,7 +2,7 @@
 
 # MySQL
 ## Introdução
-## MySQL 
+MySQL é um sistema de gerenciamento de banco de dados... Para saber mais clique [aqui](https://pt.wikipedia.org/wiki/MySQL)
 ### Instalação
 ```bash
 $ ssh pi@<ip>
@@ -74,14 +74,15 @@ A tabela para armazenar o momento que o LED mudou de estado, faz-se necessário 
 ```bash
 CREATE TABLE led_table(
     id          int AUTO_INCREMENT,
-    timestamp   NUMERIC NOT NULL, 
+    timestamp   NUMERIC NOT NULL,
+    state       VARCHAR(10) NOT NULL, 
     PRIMARY KEY (id)
 );
 ```
 Para criar essa tabela, basta digitar na linha de comando:
 
 ```bash 
-> create table led_table(id int auto_increment, timestamp numeric not null, primary key(id));
+> create table led_table(id int auto_increment, timestamp numeric not null, state varchar(10) not null, primary key(id));
 ```
 
 _output_
@@ -112,7 +113,7 @@ Com a tabela criada, agora é possível inserir os dados na tabela.
 Apartir do comando _insert_ é possível inserir dados na tabela, para isso é criada uma _query_ para compor a _string_ que será enviada para o banco de dados.
 
 ```bash
-> insert into led_info (timestamp) values (1609072545);
+> insert into led_info (timestamp, state) values (1609090934, 'ON');
 ```
 
 _output_
@@ -120,7 +121,7 @@ _output_
 Query OK, 1 row affected (0.01 sec)
 ```
 
-A _query_ criada informa o seguinte: Insira na tabela led_info no campo (timestamp) o valor 1609072545.
+A _query_ criada informa o seguinte: Insira na tabela led_info no campo (timestamp) o valor 1609090934, e no campo state a string 'ON'.
 
 ### Consultando os dados armazenados na tabela
 
@@ -132,12 +133,24 @@ Através do comando _select_ é possível consultar os dados presente na tabela:
 
 _output_
 ```bash
-+----+------------+
-| id | timestamp  |
-+----+------------+
-|  1 | 1609072545 |
-+----+------------+
++----+------------+-------+
+| id | timestamp  | state |
++----+------------+-------+
+|  1 | 1609090934 | ON    |
++----+------------+-------+
 1 row in set (0.00 sec)
 ```
+
+## MySQL no Rasbperry Pi
+### Instalação do pacote de desenvolvimento
+<strong>Obs:</strong> Para a compilação desse projeto é necessário instalar a lib hardware presente [aqui](https://github.com/NakedSolidSnake/Raspberry_lib_hardware).
+
+Para poder usar o MySQL através da linguagem C é necessário instalar a lib de desenvolvimento do MySQL
+
+```bash
+$ sudo apt-get install default-libmysqlclient-dev
+```
+
+Após o término da instalação, é possível compilar o projeto.
 
 ## Conclusão
